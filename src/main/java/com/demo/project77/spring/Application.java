@@ -3,9 +3,7 @@ package com.demo.project77.spring;
 import java.util.EnumSet;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.ApplicationArguments;
-import org.springframework.boot.ApplicationRunner;
+import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
@@ -26,36 +24,41 @@ import reactor.core.publisher.Mono;
 
 @SpringBootApplication
 @Slf4j
-public class Application implements ApplicationRunner {
-
-    @Autowired
-    private StateMachineFactory<ShoppingCartState, ShoppingCartEvent> stateMachineFactory;
+public class Application {
 
     public static void main(String[] args) {
         SpringApplication.run(Application.class, args);
     }
 
-    @Override
-    public void run(ApplicationArguments args) throws Exception {
-        StateMachine<ShoppingCartState, ShoppingCartEvent> stateMachine = stateMachineFactory.getStateMachine(
-                "mymachine");
-        stateMachine.sendEvent(getEventMessage(ShoppingCartEvent.ADD_ITEM)).subscribe();
-        if (!(stateMachine.getState().getId().equals(ShoppingCartState.SHOPPING_STATE))) throw new RuntimeException("ERROR");
-        stateMachine.sendEvent(getEventMessage(ShoppingCartEvent.ADD_ITEM)).subscribe();
-        if (!(stateMachine.getState().getId().equals(ShoppingCartState.SHOPPING_STATE))) throw new RuntimeException("ERROR");
-        stateMachine.sendEvent(getEventMessage(ShoppingCartEvent.MAKE_PAYMENT)).subscribe();
-        if (!(stateMachine.getState().getId().equals(ShoppingCartState.PAYMENT_STATE))) throw new RuntimeException("ERROR");
-        stateMachine.sendEvent(getEventMessage(ShoppingCartEvent.PAYMENT_FAIL)).subscribe();
-        if (!(stateMachine.getState().getId().equals(ShoppingCartState.SHOPPING_STATE))) throw new RuntimeException("ERROR");
-        stateMachine.sendEvent(getEventMessage(ShoppingCartEvent.MAKE_PAYMENT)).subscribe();
-        if (!(stateMachine.getState().getId().equals(ShoppingCartState.PAYMENT_STATE))) throw new RuntimeException("ERROR");
-        stateMachine.sendEvent(getEventMessage(ShoppingCartEvent.PAYMENT_SUCESS)).subscribe();
-        if (!(stateMachine.getState().getId().equals(ShoppingCartState.SHIPPED_STATE))) throw new RuntimeException("ERROR");
-        log.info("Final State: {}", stateMachine.getState().getId());
+    @Bean
+    public CommandLineRunner testStateMachine(StateMachineFactory<ShoppingCartState, ShoppingCartEvent> stateMachineFactory) {
+        return args -> {
+            StateMachine<ShoppingCartState, ShoppingCartEvent> stateMachine = stateMachineFactory.getStateMachine(
+                    "mymachine");
+            stateMachine.sendEvent(getEventMessage(ShoppingCartEvent.ADD_ITEM)).subscribe();
+            if (!(stateMachine.getState().getId().equals(ShoppingCartState.SHOPPING_STATE)))
+                throw new RuntimeException("ERROR");
+            stateMachine.sendEvent(getEventMessage(ShoppingCartEvent.ADD_ITEM)).subscribe();
+            if (!(stateMachine.getState().getId().equals(ShoppingCartState.SHOPPING_STATE)))
+                throw new RuntimeException("ERROR");
+            stateMachine.sendEvent(getEventMessage(ShoppingCartEvent.MAKE_PAYMENT)).subscribe();
+            if (!(stateMachine.getState().getId().equals(ShoppingCartState.PAYMENT_STATE)))
+                throw new RuntimeException("ERROR");
+            stateMachine.sendEvent(getEventMessage(ShoppingCartEvent.PAYMENT_FAIL)).subscribe();
+            if (!(stateMachine.getState().getId().equals(ShoppingCartState.SHOPPING_STATE)))
+                throw new RuntimeException("ERROR");
+            stateMachine.sendEvent(getEventMessage(ShoppingCartEvent.MAKE_PAYMENT)).subscribe();
+            if (!(stateMachine.getState().getId().equals(ShoppingCartState.PAYMENT_STATE)))
+                throw new RuntimeException("ERROR");
+            stateMachine.sendEvent(getEventMessage(ShoppingCartEvent.PAYMENT_SUCESS)).subscribe();
+            if (!(stateMachine.getState().getId().equals(ShoppingCartState.SHIPPED_STATE)))
+                throw new RuntimeException("ERROR");
+            log.info("Final State: {}", stateMachine.getState().getId());
+        };
     }
 
     private Mono<Message<ShoppingCartEvent>> getEventMessage(ShoppingCartEvent event) {
-       return Mono.just(MessageBuilder.withPayload(event).build());
+        return Mono.just(MessageBuilder.withPayload(event).build());
     }
 }
 

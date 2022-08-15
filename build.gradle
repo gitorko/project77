@@ -1,12 +1,12 @@
 plugins {
-    id 'org.springframework.boot' version '2.3.2.RELEASE'
-    id 'io.spring.dependency-management' version '1.0.9.RELEASE'
+    id 'org.springframework.boot' version '2.7.2'
+    id 'io.spring.dependency-management' version '1.0.12.RELEASE'
     id 'java'
 }
 
 group = 'com.demo'
 version = '1.0.0'
-sourceCompatibility = '11'
+sourceCompatibility = '17'
 
 configurations {
     compileOnly {
@@ -16,22 +16,11 @@ configurations {
 
 repositories {
     mavenCentral()
-    maven { url "https://repo.spring.io/milestone" }
-}
-
-ext {
-    springStatemachineVersion = '3.0.0.M2'
-}
-
-dependencyManagement {
-    imports {
-        mavenBom "org.springframework.statemachine:spring-statemachine-bom:${springStatemachineVersion}"
-    }
 }
 
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter'
-    compile 'org.springframework.statemachine:spring-statemachine-starter'
+    implementation 'org.springframework.statemachine:spring-statemachine-core:3.2.0'
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
 }

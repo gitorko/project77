@@ -2,20 +2,24 @@ package com.demo.project77.simple;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import lombok.Builder;
 import lombok.Data;
+import lombok.SneakyThrows;
 
 public class Application {
+
+    @SneakyThrows
     public static void main(String[] args) throws RuntimeException {
 
         NotifyListener notifyListener = new NotifyListener();
         notifyListener.registerObserver(new ShippedEventObserver());
 
         StateMachineContext stateMachine = StateMachineContext.builder()
-                        .state(new BeginState())
-                        .notifyListener(notifyListener)
-                        .build();
+                .state(new BeginState())
+                .notifyListener(notifyListener)
+                .build();
         stateMachine.sendEvent(ShoppingCartEvent.ADD_ITEM);
         if (stateMachine.getId() != ShoppingCartState.SHOPPING_STATE) throw new RuntimeException("ERROR");
         stateMachine.sendEvent(ShoppingCartEvent.ADD_ITEM);
@@ -66,17 +70,18 @@ interface State {
 @Data
 class BeginState implements State {
     public ShoppingCartState id = ShoppingCartState.BEGIN_STATE;
+
     @Override
     public void nextState(StateMachineContext stateMachine, ShoppingCartEvent event) {
         switch (event) {
-        case ADD_ITEM: {
-            ShoppingState nextState = new ShoppingState();
-            stateMachine.setState(nextState);
-            stateMachine.setId(nextState.id);
-            break;
-        }
-        default:
-            throw new UnsupportedOperationException("Not Supported!");
+            case ADD_ITEM: {
+                ShoppingState nextState = new ShoppingState();
+                stateMachine.setState(nextState);
+                stateMachine.setId(nextState.id);
+                break;
+            }
+            default:
+                throw new UnsupportedOperationException("Not Supported!");
         }
     }
 }
@@ -84,23 +89,24 @@ class BeginState implements State {
 @Data
 class ShoppingState implements State {
     ShoppingCartState id = ShoppingCartState.SHOPPING_STATE;
+
     @Override
     public void nextState(StateMachineContext stateMachine, ShoppingCartEvent event) {
         switch (event) {
-        case ADD_ITEM: {
-            ShoppingState nextState = new ShoppingState();
-            stateMachine.setState(nextState);
-            stateMachine.setId(nextState.id);
-            break;
-        }
-        case MAKE_PAYMENT: {
-            PaymentState nextState = new PaymentState();
-            stateMachine.setState(nextState);
-            stateMachine.setId(nextState.id);
-            break;
-        }
-        default:
-            throw new UnsupportedOperationException("Not Supported!");
+            case ADD_ITEM: {
+                ShoppingState nextState = new ShoppingState();
+                stateMachine.setState(nextState);
+                stateMachine.setId(nextState.id);
+                break;
+            }
+            case MAKE_PAYMENT: {
+                PaymentState nextState = new PaymentState();
+                stateMachine.setState(nextState);
+                stateMachine.setId(nextState.id);
+                break;
+            }
+            default:
+                throw new UnsupportedOperationException("Not Supported!");
         }
     }
 }
@@ -108,22 +114,23 @@ class ShoppingState implements State {
 @Data
 class PaymentState implements State {
     ShoppingCartState id = ShoppingCartState.PAYMENT_STATE;
+
     @Override
     public void nextState(StateMachineContext stateMachine, ShoppingCartEvent event) {
         switch (event) {
-        case PAYMENT_SUCESS: {
-            ShippedState nextState = new ShippedState();
-            stateMachine.setState(nextState);
-            stateMachine.setId(nextState.id);
-            break;
-        }
-        case PAYMENT_FAIL:
-            ShoppingState nextState = new ShoppingState();
-            stateMachine.setState(nextState);
-            stateMachine.setId(nextState.id);
-            break;
-        default:
-            throw new UnsupportedOperationException("Not Supported!");
+            case PAYMENT_SUCESS: {
+                ShippedState nextState = new ShippedState();
+                stateMachine.setState(nextState);
+                stateMachine.setId(nextState.id);
+                break;
+            }
+            case PAYMENT_FAIL:
+                ShoppingState nextState = new ShoppingState();
+                stateMachine.setState(nextState);
+                stateMachine.setId(nextState.id);
+                break;
+            default:
+                throw new UnsupportedOperationException("Not Supported!");
         }
     }
 }
@@ -131,6 +138,7 @@ class PaymentState implements State {
 @Data
 class ShippedState implements State {
     ShoppingCartState id = ShoppingCartState.SHIPPED_STATE;
+
     @Override
     public void nextState(StateMachineContext stateMachine, ShoppingCartEvent event) {
         throw new UnsupportedOperationException("Not Supported!");
